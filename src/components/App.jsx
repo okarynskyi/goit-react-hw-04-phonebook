@@ -1,59 +1,53 @@
-import { Component } from "react";
+import { useState, useEffect } from "react";
 import { nanoid } from 'nanoid';
 import { ContactForm } from './ContactForm/ContactForm';
 import { ContactList } from './ContactList/ContactList';
 import { Filter } from './Filter/Filter';
 import css from './App.module.css';
 
-export class App extends Component {
-  state = {
-    contacts: [
+export const App = () => {
+  const [contacts, setContacts] = useState(() => {
+    return (JSON.parse(localStorage.getItem('contacts')) || [
       { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
       { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
       { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
-    filter: ''
-  }
+    ])
+  });
+  const [filter, setFilter] = useState('');
 
-  componentDidMount() {
-    const parcedContacts = JSON.parse(localStorage.getItem('contacts'));
-    if (parcedContacts) {
-      this.setState({ contacts: parcedContacts });
-    }
-  }
+  // useEffect(() => {
+  //   const parcedContacts = JSON.parse(localStorage.getItem('contacts'));
+  //   if (parcedContacts) {
+  //     setContacts(parcedContacts);
+  //   }
+  // }, []);
 
-  componentDidUpdate(prevProps, prevState) {
-    const { contacts } = this.state;
-    if (prevState.contacts !== contacts) {
-      localStorage.setItem('contacts', JSON.stringify(contacts));
-    }
-  }
+  useEffect(() => localStorage.setItem('contacts', JSON.stringify(contacts)), [contacts])
 
-  addContact = (contact) => {
-    if (this.isDuplicate(contact)) {
+  const addContact = (contact) => {
+    if (isDuplicate(contact)) {
       return alert(`${contact.name} is already in contacts`);
     }
       
-    this.setState((prev) => {
+    setContacts((prev) => {
       const newContact = {
         id: nanoid(),
         ...contact
       }
       return {
-        contacts: [...prev.contacts, newContact]
+        contacts: [...prev, newContact]
       }
     })
   }
 
-  isDuplicate = ({ name }) => {
-    const { contacts } = this.state;
+  const isDuplicate = ({ name }) => {
     const result = contacts.find((item) => item.name.toLowerCase() === name.toLowerCase());
     return result;
   }
 
-  removeContact = (id) => {
-    this.setState((prev) => {
+  const removeContact = (id) => {
+    setContacts((prev) => {
       const newContacts = prev.contacts.filter((item) => item.id !== id)
       return {
         contacts: newContacts
@@ -61,16 +55,18 @@ export class App extends Component {
     })
   }
 
-  handleChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    this.setState({
+    setFilter({
             [name]: value,
         })
   }
 
-  getFilteredContacts = () => {
-    const { contacts, filter } = this.state
-    
+  // const handleChange = (e) => {
+  //   setFilter(e.currentTarget.value)
+  // }
+
+  const getFilteredContacts = () => {
     if (!filter) { return contacts }
     
     const normalizedFilter = filter.toLocaleLowerCase();
@@ -83,21 +79,17 @@ export class App extends Component {
     return filteredContacts
   }
 
-  render() {
-    const { addContact, removeContact, handleChange } = this;
-    const { filter } = this.state;
-    const contacts = this.getFilteredContacts();
+  const filterContacts = getFilteredContacts();
 
-    return (
-      <>
-        <div className={css.container}>
-          <h1>Phonebook</h1>
-          <ContactForm addContact={addContact} />
-          <h2>Contacts</h2>
-          <Filter filter={filter} handleChange={handleChange} />
-          <ContactList contacts={contacts} removeContact={removeContact} />
-        </div>        
-      </>
-    )
-  }
+  return (
+    <>
+      <div className={css.container}>
+        <h1>Phonebook</h1>
+        <ContactForm addContact={addContact} />
+        <h2>Contacts</h2>
+        <Filter filter={filter} handleChange={handleChange} />
+        <ContactList contacts={filterContacts} removeContact={removeContact} />
+      </div>        
+    </>
+  )
 };
