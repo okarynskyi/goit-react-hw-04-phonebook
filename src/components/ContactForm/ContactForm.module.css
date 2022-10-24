@@ -1,0 +1,28 @@
+.form {
+    width: 320px;
+    padding: 16px;
+    border: 2px solid;
+}
+
+.input {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.input_label {
+    margin-bottom: 6px;
+}
+
+.input_text {
+    margin-bottom: 20px;
+    width: 130px;
+}
+
+.input_button {
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.16);
+}
+
+.input_button:hover {
+    background-color: rgb(32, 122, 248);
+}
