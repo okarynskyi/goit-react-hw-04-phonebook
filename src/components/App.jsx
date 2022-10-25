@@ -19,7 +19,7 @@ export const App = () => {
   // useEffect(() => {
   //   const parcedContacts = JSON.parse(localStorage.getItem('contacts'));
   //   if (parcedContacts) {
-  //     setContacts(parcedContacts);
+  //     setContacts(parcedContacts)
   //   }
   // }, []);
 
@@ -35,9 +35,7 @@ export const App = () => {
         id: nanoid(),
         ...contact
       }
-      return {
-        contacts: [...prev, newContact]
-      }
+      return [...prev, newContact]
     })
   }
 
@@ -48,38 +46,28 @@ export const App = () => {
 
   const removeContact = (id) => {
     setContacts((prev) => {
-      const newContacts = prev.contacts.filter((item) => item.id !== id)
-      return {
-        contacts: newContacts
-      }
+      const newContacts = prev.filter((item) => item.id !== id)
+      return newContacts
     })
   }
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFilter({
-            [name]: value,
-        })
+    setFilter(e.currentTarget.value)
   }
-
-  // const handleChange = (e) => {
-  //   setFilter(e.currentTarget.value)
-  // }
 
   const getFilteredContacts = () => {
     if (!filter) { return contacts }
     
-    const normalizedFilter = filter.toLocaleLowerCase();
+    const normalizedFilter = filter.toLowerCase();
     const filteredContacts = contacts.filter(({ name, number }) => {
-      const normalizedName = name.toLocaleLowerCase();
-      const normalizedNumber = number.toLocaleLowerCase();
+      const normalizedName = name.toLowerCase();
+      const normalizedNumber = number.toLowerCase();
       const result = normalizedName.includes(normalizedFilter) || normalizedNumber.includes(normalizedFilter);
       return result
     })
+
     return filteredContacts
   }
-
-  const filterContacts = getFilteredContacts();
 
   return (
     <>
@@ -88,7 +76,7 @@ export const App = () => {
         <ContactForm addContact={addContact} />
         <h2>Contacts</h2>
         <Filter filter={filter} handleChange={handleChange} />
-        <ContactList contacts={filterContacts} removeContact={removeContact} />
+        <ContactList contacts={getFilteredContacts()} removeContact={removeContact} />
       </div>        
     </>
   )
